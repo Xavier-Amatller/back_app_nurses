@@ -14,16 +14,16 @@ class Auxiliar
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 10, unique: true)]
+   #[ORM\Column(name: "aux_num_trabajador", length: 10, unique: true)]
     private ?string $aux_num_trabajador = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(name: "aux_nombre", length: 50)]
     private ?string $aux_nombre = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(name: "aux_apellidos", length: 150)]
     private ?string $aux_apellidos = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: "aux_password", length: 255)]
     private ?string $aux_password = null;
 
     public function getId(): ?int

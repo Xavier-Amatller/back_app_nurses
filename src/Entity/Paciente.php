@@ -24,11 +24,8 @@ class Paciente
     #[ORM\Column(length: 150)]
     private ?string $pac_apellidos = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $pac_fecha_nacimiento = null;
-
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $pac_fecha_nacimiento1 = null;
+    private ?\DateTimeInterface $pac_fecha_nacimiento = null;
 
     #[ORM\Column(length: 255)]
     private ?string $pac_direccion_completa = null;
@@ -95,26 +92,14 @@ class Paciente
         return $this;
     }
 
-    public function getPacFechaNacimiento(): ?string
+    public function getPacFechaNacimiento(): ?\DateTimeInterface
     {
         return $this->pac_fecha_nacimiento;
     }
 
-    public function setPacFechaNacimiento(string $pac_fecha_nacimiento): static
+    public function setPacFechaNacimiento(\DateTimeInterface $pac_fecha_nacimiento): static
     {
         $this->pac_fecha_nacimiento = $pac_fecha_nacimiento;
-
-        return $this;
-    }
-
-    public function getPacFechaNacimiento1(): ?\DateTimeInterface
-    {
-        return $this->pac_fecha_nacimiento1;
-    }
-
-    public function setPacFechaNacimiento1(\DateTimeInterface $pac_fecha_nacimiento1): static
-    {
-        $this->pac_fecha_nacimiento1 = $pac_fecha_nacimiento1;
 
         return $this;
     }

@@ -3,14 +3,21 @@
 namespace App\Controller;
 
 use App\Entity\Auxiliar;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class AuxiliaresController extends AbstractController{
+
+final class AuxiliarController extends AbstractController  {
+    private $auxiliarRep;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->auxiliarRep = $entityManager->getRepository(Auxiliar::class);
+    }
+
     #[Route('/auxiliares', name: 'app_auxiliares')]
     public function index(): Response
     {
@@ -20,16 +27,12 @@ final class AuxiliaresController extends AbstractController{
     }
 
     #[Route('/auxiliares/listar', name: 'app_auxiliares_crear')]
-    public function listar(EntityManagerInterface $entityManager): Response
+    public function listar(): Response
     {
 
-        $auxiliarrepository = $entityManager->getRepository(Auxiliar::class);
+        $auxiliares = $this->auxiliarRep->listAuxiliares();
 
-        $auxiliares = $auxiliarrepository->listAuxiliares();
-
-        return new JsonResponse([
-            'auxiliares' => $auxiliares
-        ]);
+        return new JsonResponse($auxiliares, 200, [], true);
     }
 
 }

@@ -55,7 +55,7 @@ final class AuxiliarController extends AbstractController  {
         $numTrabajador = $data['aux_num_trabajador'] ?? '';
         $password = $data['aux_password'] ?? '';
 
-        $auxiliar = $this->auxiliarRep->findOneBy(['aux_num_trabajador' => $numTrabajador]);
+        $auxiliar = $this->auxiliarRep->findOneBy(['aux_num_trabajador' => $numTrabajador, 'aux_password' => $password]);
 
         if (!$auxiliar){
             return new JsonResponse();

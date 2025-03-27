@@ -4,10 +4,12 @@ namespace App\Entity;
 
 use App\Repository\AuxiliarRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: AuxiliarRepository::class)]
 #[ORM\Table(name: "auxiliares")]
-class Auxiliar
+class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -78,4 +80,40 @@ class Auxiliar
 
         return $this;
     }
+
+
+    // Métodos requeridos por UserInterface
+    public function getRoles(): array
+    {
+        return ['ROLE_AUXILIAR'];
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->aux_password;
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function getUsername(): string
+    {
+        // Mantén esto por compatibilidad, pero no es obligatorio si usas getUserIdentifier
+        return $this->aux_num_trabajador ?? '';
+    }
+
+    public function eraseCredentials(): void
+    {
+        // No hay nada que borrar en este caso
+    }
+
+    // Método obligatorio desde Symfony 5.3+
+    public function getUserIdentifier(): string
+    {
+        // Usamos aux_num_trabajador como identificador único
+        return $this->aux_num_trabajador ?? '';
+    }
+
 }

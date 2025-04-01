@@ -58,7 +58,7 @@ final class AuxiliarController extends AbstractController  {
         $auxiliar = $this->auxiliarRep->findOneBy(['aux_num_trabajador' => $numTrabajador, 'aux_password' => $password]);
 
         if (!$auxiliar){
-            return new JsonResponse();
+            return new JsonResponse(false);
         }
 
         $token = $jwtManager->create($auxiliar);

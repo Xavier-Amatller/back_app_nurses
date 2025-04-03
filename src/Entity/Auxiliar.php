@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AuxiliarRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -27,6 +29,17 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(name: "aux_password", length: 255)]
     private ?string $aux_password = null;
+
+    /**
+     * @var Collection<int, Registro>
+     */
+    #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'aux_num_trabajador')]
+    private Collection $registros;
+
+    public function __construct()
+    {
+        $this->registros = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -114,6 +127,36 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // Usamos aux_num_trabajador como identificador único
         return $this->aux_num_trabajador ?? '';
+    }
+
+    /**
+     * @return Collection<int, Registro>
+     */
+    public function getRegistros(): Collection
+    {
+        return $this->registros;
+    }
+
+    public function addRegistros(Registro $registro): static
+    {
+        if (!$this->registros->contains($registro)) {
+            $this->registros->add($registro);
+            $registro->setAuxNumTrabajador($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistro(Registro $registro): static
+    {
+        if ($this->registros->removeElement($registro)) {
+            // set the owning side to null (unless already changed)
+            if ($registro->getAuxNumTrabajador() === $this) {
+                $registro->setAuxNumTrabajador(null);
+            }
+        }
+
+        return $this;
     }
 
 }

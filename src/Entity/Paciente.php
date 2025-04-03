@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PacienteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -50,6 +52,17 @@ class Paciente
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $pac_timestamp = null;
+
+    /**
+     * @var Collection<int, Registro>
+     */
+    #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'pac_num_historial')]
+    private Collection $registros;
+
+public function __construct()
+    {
+        $this->registros = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -196,6 +209,36 @@ class Paciente
     public function setPacTimestamp(\DateTimeInterface $pac_timestamp): static
     {
         $this->pac_timestamp = $pac_timestamp;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Registro>
+     */
+    public function getRegistros(): Collection
+    {
+        return $this->registros;
+    }
+
+    public function addRegistro(Registro $registro): static
+    {
+        if (!$this->registros->contains($registro)) {
+            $this->registros->add($registro);
+            $registro->setPacNumHistorial($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistro(Registro $registro): static
+    {
+        if ($this->registros->removeElement($registro)) {
+            // set the owning side to null (unless already changed)
+            if ($registro->getPacNumHistorial() === $this) {
+                $registro->setPacNumHistorial(null);
+            }
+        }
 
         return $this;
     }

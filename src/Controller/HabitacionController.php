@@ -29,10 +29,8 @@ final class HabitacionController extends AbstractController
 
         $result = $this->habitacionRep->findPaginated($page, $limit);
 
-        dd($result["data"]);
-
         return new JsonResponse([
-            'data' => "xxxx",
+            'data' => $result['data'],
             'totalItems' => $result['totalItems'],
             'totalPages' => $result['totalPages'],
             'page' => $result['currentPage'],

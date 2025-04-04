@@ -13,7 +13,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 
-final class AuxiliarController extends AbstractController  {
+final class AuxiliarController extends AbstractController
+{
     private $auxiliarRep;
 
     public function __construct(EntityManagerInterface $entityManager)
@@ -21,18 +22,10 @@ final class AuxiliarController extends AbstractController  {
         $this->auxiliarRep = $entityManager->getRepository(Auxiliar::class);
     }
 
-    #[Route('/auxiliares', name: 'app_auxiliares')]
-    public function index(): Response
-    {
-        return $this->render('auxiliares/index.html.twig', [
-            'controller_name' => 'AuxiliaresController',
-        ]);
-    }
 
     #[Route('/auxiliares/listar', name: 'app_auxiliares_crear')]
     public function listar(): Response
     {
-
         $auxiliares = $this->auxiliarRep->listAuxiliares();
 
         return new JsonResponse($auxiliares, 200, [], true);
@@ -47,7 +40,6 @@ final class AuxiliarController extends AbstractController  {
         return new JsonResponse(['message' => 'It works']);
     }
 
-    
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(Request $request, JWTTokenManagerInterface $jwtManager): JsonResponse
     {
@@ -59,10 +51,10 @@ final class AuxiliarController extends AbstractController  {
 
         if (!$auxiliar){
             return new JsonResponse(false);
+
         }
 
         $token = $jwtManager->create($auxiliar);
         return new JsonResponse(['token' => $token]);
     }
-
 }

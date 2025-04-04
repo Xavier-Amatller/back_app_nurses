@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: AuxiliarRepository::class)]
-#[ORM\Table(name: "auxiliares")]
+#0 
 class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -18,7 +18,7 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-   #[ORM\Column(name: "aux_num_trabajador", length: 10, unique: true)]
+    #[ORM\Column(name: "aux_num_trabajador", length: 10, unique: true)]
     private ?string $aux_num_trabajador = null;
 
     #[ORM\Column(name: "aux_nombre", length: 50)]
@@ -158,5 +158,4 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
 }

@@ -56,7 +56,7 @@ class Paciente
     /**
      * @var Collection<int, Registro>
      */
-    #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'pac_num_historial')]
+    #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'pac_id')]
     private Collection $registros;
 
     public function __construct()
@@ -225,7 +225,7 @@ class Paciente
     {
         if (!$this->registros->contains($registro)) {
             $this->registros->add($registro);
-            $registro->setPacNumHistorial($this);
+            $registro->setPacId($this);
         }
 
         return $this;
@@ -235,8 +235,8 @@ class Paciente
     {
         if ($this->registros->removeElement($registro)) {
             // set the owning side to null (unless already changed)
-            if ($registro->getPacNumHistorial() === $this) {
-                $registro->setPacNumHistorial(null);
+            if ($registro->getPacId() === $this) {
+                $registro->setPacId(null);
             }
         }
 

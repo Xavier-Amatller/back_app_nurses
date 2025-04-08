@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: AuxiliarRepository::class)]
-#0 
+#[ORM\Table(name: "auxiliares")]
 class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -33,7 +33,7 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Registro>
      */
-    #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'aux_num_trabajador')]
+    #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'aux_id')]
     private Collection $registros;
 
     public function __construct()
@@ -141,7 +141,7 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->registros->contains($registro)) {
             $this->registros->add($registro);
-            $registro->setAuxNumTrabajador($this);
+            $registro->setAuxId($this);
         }
 
         return $this;
@@ -151,8 +151,8 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->registros->removeElement($registro)) {
             // set the owning side to null (unless already changed)
-            if ($registro->getAuxNumTrabajador() === $this) {
-                $registro->setAuxNumTrabajador(null);
+            if ($registro->getAuxId() === $this) {
+                $registro->setAuxId(null);
             }
         }
 

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ConstantesVitalesRepository::class)]
+#[ORM\Table(name: "constantes_vitales")]
 class ConstantesVitales
 {
     #[ORM\Id]

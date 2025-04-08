@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RegistroRepository::class)]
+#[ORM\Table(name: "registros")]
 class Registro
 {
     #[ORM\Id]
@@ -15,44 +16,49 @@ class Registro
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'registros')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Auxiliar $aux_num_trabajador = null;
+    #[ORM\JoinColumn(name: 'aux_id', nullable: false)]
+    private ?Auxiliar $aux_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'registros')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Paciente $pac_num_historial = null;
+    #[ORM\JoinColumn(name: 'pac_id', nullable: false)]
+    private ?Paciente $pac_id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $reg_timestamp = null;
 
+    #[ORM\OneToOne(targetEntity: ConstantesVitales::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'cv_id', referencedColumnName: 'id', nullable: true)]
+    private ?ConstantesVitales $cv_id = null;
+
     #[ORM\OneToOne(inversedBy: 'registro', cascade: ['persist', 'remove'])]
-    private ?ConstantesVitales $cv = null;
+    #[ORM\JoinColumn(name: 'die_id', referencedColumnName: 'id', nullable: true)]
+    private ?Dieta $die_id = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getAuxNumTrabajador(): ?Auxiliar
+    public function getAuxId(): ?Auxiliar
     {
-        return $this->aux_num_trabajador;
+        return $this->aux_id;
     }
 
-    public function setAuxNumTrabajador(?Auxiliar $aux_num_trabajador): static
+    public function setAuxId(?Auxiliar $aux_id): static
     {
-        $this->aux_num_trabajador = $aux_num_trabajador;
+        $this->aux_id = $aux_id;
 
         return $this;
     }
 
-    public function getPacNumHistorial(): ?Paciente
+    public function getPacId(): ?Paciente
     {
-        return $this->pac_num_historial;
+        return $this->pac_id;
     }
 
-    public function setPacNumHistorial(?Paciente $pac_num_historial): static
+    public function setPacId(?Paciente $pac_id): static
     {
-        $this->pac_num_historial = $pac_num_historial;
+        $this->pac_id = $pac_id;
 
         return $this;
     }
@@ -71,12 +77,24 @@ class Registro
 
     public function getCvId(): ?ConstantesVitales
     {
-        return $this->cv;
+        return $this->cv_id;
     }
 
-    public function setCvId(?ConstantesVitales $cv): static
+    public function setCvId(?ConstantesVitales $cv_id): static
     {
-        $this->cv = $cv;
+        $this->cv_id = $cv_id;
+
+        return $this;
+    }
+
+    public function getDieId(): ?Dieta
+    {
+        return $this->die_id;
+    }
+
+    public function setDieId(?Dieta $die): static
+    {
+        $this->die_id = $die;
 
         return $this;
     }

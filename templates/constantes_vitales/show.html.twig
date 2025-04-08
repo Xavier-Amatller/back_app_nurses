@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ConstantesVitales{% endblock %}
+
+{% block body %}
+    <h1>ConstantesVitales</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ constantes_vitale.id }}</td>
+            </tr>
+            <tr>
+                <th>Cv_ta_sistolica</th>
+                <td>{{ constantes_vitale.cvTaSistolica }}</td>
+            </tr>
+            <tr>
+                <th>Cv_ta_diastolica</th>
+                <td>{{ constantes_vitale.cvTaDiastolica }}</td>
+            </tr>
+            <tr>
+                <th>Cv_frequencia_respiratoria</th>
+                <td>{{ constantes_vitale.cvFrequenciaRespiratoria }}</td>
+            </tr>
+            <tr>
+                <th>Cv_pulso</th>
+                <td>{{ constantes_vitale.cvPulso }}</td>
+            </tr>
+            <tr>
+                <th>Cv_temperatura</th>
+                <td>{{ constantes_vitale.cvTemperatura }}</td>
+            </tr>
+            <tr>
+                <th>Cv_saturacion_oxigeno</th>
+                <td>{{ constantes_vitale.cvSaturacionOxigeno }}</td>
+            </tr>
+            <tr>
+                <th>Cv_talla</th>
+                <td>{{ constantes_vitale.cvTalla }}</td>
+            </tr>
+            <tr>
+                <th>Cv_diuresis</th>
+                <td>{{ constantes_vitale.cvDiuresis }}</td>
+            </tr>
+            <tr>
+                <th>Cv_deposiciones</th>
+                <td>{{ constantes_vitale.cvDeposiciones }}</td>
+            </tr>
+            <tr>
+                <th>Cv_stp</th>
+                <td>{{ constantes_vitale.cvStp }}</td>
+            </tr>
+            <tr>
+                <th>Cv_timestamp</th>
+                <td>{{ constantes_vitale.cvTimestamp ? constantes_vitale.cvTimestamp|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_constantes_vitales_index') }}">back to list</a>
+
+    <a href="{{ path('app_constantes_vitales_edit', {'id': constantes_vitale.id}) }}">edit</a>
+
+    {{ include('constantes_vitales/_delete_form.html.twig') }}
+{% endblock %}

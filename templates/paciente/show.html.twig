@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paciente{% endblock %}
+
+{% block body %}
+    <h1>Paciente</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ paciente.id }}</td>
+            </tr>
+            <tr>
+                <th>Pac_num_historial</th>
+                <td>{{ paciente.pacNumHistorial }}</td>
+            </tr>
+            <tr>
+                <th>Pac_nombre</th>
+                <td>{{ paciente.pacNombre }}</td>
+            </tr>
+            <tr>
+                <th>Pac_apellidos</th>
+                <td>{{ paciente.pacApellidos }}</td>
+            </tr>
+            <tr>
+                <th>Pac_fecha_nacimiento</th>
+                <td>{{ paciente.pacFechaNacimiento ? paciente.pacFechaNacimiento|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Pac_direccion_completa</th>
+                <td>{{ paciente.pacDireccionCompleta }}</td>
+            </tr>
+            <tr>
+                <th>Pac_lengua_materna</th>
+                <td>{{ paciente.pacLenguaMaterna }}</td>
+            </tr>
+            <tr>
+                <th>Pac_antecedentes</th>
+                <td>{{ paciente.pacAntecedentes }}</td>
+            </tr>
+            <tr>
+                <th>Pac_alergias</th>
+                <td>{{ paciente.pacAlergias }}</td>
+            </tr>
+            <tr>
+                <th>Pac_nombre_cuidador</th>
+                <td>{{ paciente.pacNombreCuidador }}</td>
+            </tr>
+            <tr>
+                <th>Pac_telefono_cuidador</th>
+                <td>{{ paciente.pacTelefonoCuidador }}</td>
+            </tr>
+            <tr>
+                <th>Pac_fecha_ingreso</th>
+                <td>{{ paciente.pacFechaIngreso ? paciente.pacFechaIngreso|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Pac_timestamp</th>
+                <td>{{ paciente.pacTimestamp ? paciente.pacTimestamp|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_paciente_index') }}">back to list</a>
+
+    <a href="{{ path('app_paciente_edit', {'id': paciente.id}) }}">edit</a>
+
+    {{ include('paciente/_delete_form.html.twig') }}
+{% endblock %}

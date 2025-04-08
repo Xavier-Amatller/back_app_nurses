@@ -48,7 +48,7 @@ class ConstantesVitales
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $cv_timestamp = null;
 
-    #[ORM\OneToOne(mappedBy: 'cv', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'cv_id', cascade: ['persist', 'remove'])]
     private ?Registro $registro = null;
 
     public function getId(): ?int

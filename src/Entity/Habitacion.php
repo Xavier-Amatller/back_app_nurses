@@ -21,8 +21,8 @@ class Habitacion
     private ?string $hab_obs = null;
 
     #[ORM\OneToOne(targetEntity: Paciente::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'pac_numhistorial', referencedColumnName: 'pac_numhistorial', nullable: true)]
-    private ?Paciente $pac_numhistorial = null;
+    #[ORM\JoinColumn(name: 'pac_num_historial', referencedColumnName: 'pac_num_historial', nullable: true)]
+    private ?Paciente $pac_num_historial = null;
 
     public function getId(): ?int
     {
@@ -55,12 +55,12 @@ class Habitacion
 
     public function getPaciente(): ?Paciente
     {
-        return $this->pac_numhistorial;
+        return $this->pac_num_historial;
     }
 
-    public function setPaciente(?Paciente $pac_numhistorial): static
+    public function setPaciente(?Paciente $pac_num_historial): static
     {
-        $this->pac_numhistorial = $pac_numhistorial;
+        $this->pac_num_historial = $pac_num_historial;
 
         return $this;
     }

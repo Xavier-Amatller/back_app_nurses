@@ -20,21 +20,33 @@ final class HabitacionController extends AbstractController
         $this->habitacionRep = $entityManager->getRepository(Habitacion::class);
     }
 
-
-    #[Route('/test/habitaciones', name: 'api_habitaciones', methods: ['GET'])]
+    #[Route('/test/rooms', name: 'api_habitaciones', methods: ['GET'])]
     public function getHabitaciones(Request $request): JsonResponse
     {
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 4);
 
-        $result = $this->habitacionRep->findPaginated($page, $limit);
+        $rooms = $this->habitacionRep->findPaginated($page, $limit);
+
+        $data = array_map(function ($room) {
+            $patient = $room->getPaciente();
+            return [
+                'id' => $room->getId(),
+                'hab_id' => $room->getHabId(),
+                'hab_obs' => $room->getHabObs(),
+                'paciente' => $patient ? [
+                    'pac_numhistorial' => $patient->getPacNumhistorial(),
+                    'pac_nombre' => $patient->getPacNombre(),
+                    'pac_apellidos' => $patient->getPacApellidos(),
+                ] : null,
+            ];
+        },  $rooms['rooms']);
 
         return new JsonResponse([
-            'data' => $result['data'],
-            'totalItems' => $result['totalItems'],
-            'totalPages' => $result['totalPages'],
-            'page' => $result['currentPage'],
-            'limit' => $result['limit'],
+            'rooms' => $data,
+            'totalItems' => $rooms['totalRooms'],
+            'page' => $page,
+            'limit' => $limit,
         ]);
     }
 }

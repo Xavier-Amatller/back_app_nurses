@@ -18,7 +18,7 @@ class Paciente
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    private ?int $pac_numhistorial = null;
+    private ?int $pac_num_historial = null;
 
     #[ORM\Column(length: 50)]
     private ?string $pac_nombre = null;
@@ -59,7 +59,7 @@ class Paciente
     #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'pac_num_historial')]
     private Collection $registros;
 
-public function __construct()
+    public function __construct()
     {
         $this->registros = new ArrayCollection();
     }
@@ -71,12 +71,12 @@ public function __construct()
 
     public function getPacNumhistorial(): ?int
     {
-        return $this->pac_numhistorial;
+        return $this->pac_num_historial;
     }
 
-    public function setPacNumhistorial(int $pac_numhistorial): static
+    public function setPacNumhistorial(int $pac_num_historial): static
     {
-        $this->pac_numhistorial = $pac_numhistorial;
+        $this->pac_num_historial = $pac_num_historial;
 
         return $this;
     }

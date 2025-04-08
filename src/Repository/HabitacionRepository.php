@@ -15,7 +15,7 @@ class HabitacionRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Habitacion::class);
-    }
+    }   
 
     public function findPaginated(int $page, int $limit): array
     {
@@ -28,16 +28,13 @@ class HabitacionRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
 
         $paginator = new Paginator($query);
-        $totalItems = count($paginator);
+        $totalRooms = count($paginator);
 
         $rooms = $query->getResult();
 
         return [
-            'data' => $rooms,
-            'totalItems' => $totalItems,
-            'totalPages' => ceil($totalItems / $limit),
-            'currentPage' => $page,
-            'limit' => $limit,
+            'rooms' => $rooms,
+            'totalRooms' => $totalRooms,
         ];
     }
     //    /**

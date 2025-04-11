@@ -66,6 +66,9 @@ final class DietaController extends AbstractController
         $dietaIds = [];
 
         foreach ($registros as $registro) {
+            if($registro->getDieta() == null) {
+                continue;
+            }
             $dietaIds[] = $registro->getDieta()->getId();
         }
         $dieta = $dietaRepository->find($dietaIds[count($dietaIds) - 1]);

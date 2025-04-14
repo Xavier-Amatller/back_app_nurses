@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Auxiliar;
 use App\Entity\Dieta;
+use App\Entity\Registro;
 use App\Entity\TiposDieta;
 use App\Entity\TiposTexturas;
 use App\Form\DietaType;
+use App\Repository\AuxiliarRepository;
 use App\Repository\DietaRepository;
 use App\Repository\HabitacionRepository;
 use App\Repository\PacienteRepository;
@@ -66,7 +69,7 @@ final class DietaController extends AbstractController
         $dietaIds = [];
 
         foreach ($registros as $registro) {
-            if($registro->getDieta() == null) {
+            if ($registro->getDieta() == null) {
                 continue;
             }
             $dietaIds[] = $registro->getDieta()->getId();
@@ -77,6 +80,7 @@ final class DietaController extends AbstractController
             [
                 'status' => 200,
                 'data' => [
+                    'pac_id' => $pacienteId->getId(),
                     'id' => $dieta->getId(),
                     'Die_Autonomo' => $dieta->isDieAutonomo(),
                     'Die_Protesi' => $dieta->isDieProtesi(),
@@ -96,25 +100,69 @@ final class DietaController extends AbstractController
 
     }
 
-    #[Route('/new', name: 'app_dieta_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $dietum = new Dieta();
-        $form = $this->createForm(DietaType::class, $dietum);
-        $form->handleRequest($request);
+    #[Route('/new', name: 'app_dieta_new', methods: ['POST'])]
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        TiposDietaRepository $tiposDietaRepository,
+        TiposTexturasRepository $tiposTexturasRepository,
+        PacienteRepository $pacienteRepository,
+        AuxiliarRepository $auxiliarRepository
+    ): JsonResponse {
+        $data = $request->toArray();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($dietum);
-            $entityManager->flush();
+        $pacId = $data['pac_id'];
+        $textureId = $data['textureId'];
+        $dietTypes = $data['dietTypes'];
+        $autonomy = $data['autonomy'];
+        $prosthesis = $data['prosthesis'];
 
-            return $this->redirectToRoute('app_dieta_index', [], Response::HTTP_SEE_OTHER);
+        // Create a new Registro
+        $registro = new Registro();
+
+        // Create a new Dieta
+        $dieta = new Dieta();
+        $dieta->setDieAutonomo($autonomy);
+        $dieta->setDieProtesi($prosthesis);
+
+        // Validate and set texture
+        $texture = $tiposTexturasRepository->find($textureId);
+        if (!$texture) {
+            return new JsonResponse(
+                ['status' => 'error', 'message' => 'Invalid texture ID'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+        $dieta->setDieTText($texture);
+
+        // Add diet types to Dieta
+        foreach ($dietTypes as $dietTypeId) {
+            $tipoDieta = $tiposDietaRepository->find($dietTypeId);
+            if ($tipoDieta) {
+                $dieta->addTiposDieta($tipoDieta);
+            }
         }
 
-        return $this->render('dieta/new.html.twig', [
-            'dietum' => $dietum,
-            'form' => $form,
-        ]);
+        // Find patient and auxiliar
+        $patient = $pacienteRepository->find($pacId);
+        $auxiliar = $auxiliarRepository->find(1);
+
+        // Associate Dieta with Registro
+        $registro->setPacId($patient);
+        $registro->setDieta($dieta);
+        $registro->setAuxId($auxiliar);
+
+        // Persist the new Registro and Dieta
+        $entityManager->persist($dieta);
+        $entityManager->persist($registro);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['status' => 'success', 'message' => 'Registro and Dieta created successfully'],
+            Response::HTTP_CREATED
+        );
     }
+
 
     // #[Route('/{id}', name: 'app_dieta_show', methods: ['GET'])]
     // public function show(Dieta $dietum): Response

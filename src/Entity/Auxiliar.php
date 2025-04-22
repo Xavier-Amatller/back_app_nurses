@@ -141,7 +141,7 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->registros->contains($registro)) {
             $this->registros->add($registro);
-            $registro->setAuxId($this);
+            $registro->setAuxiliar($this);
         }
 
         return $this;
@@ -151,8 +151,8 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->registros->removeElement($registro)) {
             // set the owning side to null (unless already changed)
-            if ($registro->getAuxId() === $this) {
-                $registro->setAuxId(null);
+            if ($registro->getAuxiliar() === $this) {
+                $registro->setAuxiliar(null);
             }
         }
 

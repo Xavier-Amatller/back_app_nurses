@@ -225,7 +225,7 @@ class Paciente
     {
         if (!$this->registros->contains($registro)) {
             $this->registros->add($registro);
-            $registro->setPacId($this);
+            $registro->setPaciente($this);
         }
 
         return $this;
@@ -235,8 +235,8 @@ class Paciente
     {
         if ($this->registros->removeElement($registro)) {
             // set the owning side to null (unless already changed)
-            if ($registro->getPacId() === $this) {
-                $registro->setPacId(null);
+            if ($registro->getPaciente() === $this) {
+                $registro->setPaciente(null);
             }
         }
 

@@ -197,12 +197,12 @@ class ConstantesVitales
     {
         // unset the owning side of the relation if necessary
         if ($registro === null && $this->registro !== null) {
-            $this->registro->setCvId(null);
+            $this->registro->setCosntantesVitales(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($registro !== null && $registro->getCvId() !== $this) {
-            $registro->setCvId($this);
+        if ($registro !== null && $registro->getConstantesVitales() !== $this) {
+            $registro->setCosntantesVitales($this);
         }
 
         $this->registro = $registro;

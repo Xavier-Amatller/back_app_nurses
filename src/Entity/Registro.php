@@ -30,33 +30,41 @@ class Registro
     #[ORM\JoinColumn(name: 'cv_id', referencedColumnName: 'id', nullable: true)]
     private ?ConstantesVitales $cv_id = null;
 
-    #[ORM\OneToOne(inversedBy: 'registro', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: Dieta::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'die_id', referencedColumnName: 'id', nullable: true)]
     private ?Dieta $die_id = null;
+
+    #[ORM\OneToOne(targetEntity: Movilizacion::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'mov_id', referencedColumnName: 'id', nullable: true)]
+    private ?Movilizacion $mov_id = null;
+
+    #[ORM\OneToOne(targetEntity: Diagnostico::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'dia_id', referencedColumnName: 'id', nullable: true)]
+    private ?Diagnostico $dia_id = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getAuxId(): ?Auxiliar
+    public function getAuxiliar(): ?Auxiliar
     {
         return $this->aux_id;
     }
 
-    public function setAuxId(?Auxiliar $aux_id): static
+    public function setAuxiliar(?Auxiliar $aux_id): static
     {
         $this->aux_id = $aux_id;
 
         return $this;
     }
 
-    public function getPacId(): ?Paciente
+    public function getPaciente(): ?Paciente
     {
         return $this->pac_id;
     }
 
-    public function setPacId(?Paciente $pac_id): static
+    public function setPaciente(?Paciente $pac_id): static
     {
         $this->pac_id = $pac_id;
 
@@ -75,12 +83,12 @@ class Registro
         return $this;
     }
 
-    public function getCvId(): ?ConstantesVitales
+    public function getConstantesVitales(): ?ConstantesVitales
     {
         return $this->cv_id;
     }
 
-    public function setCvId(?ConstantesVitales $cv_id): static
+    public function setCosntantesVitales(?ConstantesVitales $cv_id): static
     {
         $this->cv_id = $cv_id;
 
@@ -92,12 +100,34 @@ class Registro
         return $this->die_id;
     }
 
-    public function setDieta(?Dieta $die): static
+    public function setDieta(?Dieta $die_id): static
     {
-        $this->die_id = $die;
+        $this->die_id = $die_id;
 
         return $this;
     }
 
+    public function getMovilizacion(): ?Movilizacion
+    {
+        return $this->mov_id;
+    }
 
+    public function setMovilizacion(?Movilizacion $mov_id): static
+    {
+        $this->mov_id = $mov_id;
+
+        return $this;
+    }
+
+    public function getDiagnostico(): ?Diagnostico
+    {
+        return $this->dia_id;
+    }
+
+    public function setDiagnostico(?Diagnostico $dia_id): static
+    {
+        $this->dia_id = $dia_id;
+
+        return $this;
+    }
 }

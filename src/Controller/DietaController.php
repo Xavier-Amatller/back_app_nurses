@@ -116,6 +116,7 @@ final class DietaController extends AbstractController
         $dietTypes = $data['dietTypes'];
         $autonomy = $data['autonomy'];
         $prosthesis = $data['prosthesis'];
+        $auxId = $data['aux_number'];
 
         // Create a new Registro
         $registro = new Registro();
@@ -145,7 +146,7 @@ final class DietaController extends AbstractController
 
         // Find patient and auxiliar
         $patient = $pacienteRepository->find($pacId);
-        $auxiliar = $auxiliarRepository->find(1);
+        $auxiliar = $auxiliarRepository->find($auxId);
 
         // Associate Dieta with Registro
         $registro->setPacId($patient);

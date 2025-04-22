@@ -55,6 +55,6 @@ final class AuxiliarController extends AbstractController
         }
 
         $token = $jwtManager->create($auxiliar);
-        return new JsonResponse(['token' => $token]);
+        return new JsonResponse(['token' => $token,'aux_id' => $auxiliar->getId()]);
     }
 }

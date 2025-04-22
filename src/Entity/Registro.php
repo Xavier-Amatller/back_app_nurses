@@ -87,12 +87,12 @@ class Registro
         return $this;
     }
 
-    public function getDieId(): ?Dieta
+    public function getDieta(): ?Dieta
     {
         return $this->die_id;
     }
 
-    public function setDieId(?Dieta $die): static
+    public function setDieta(?Dieta $die): static
     {
         $this->die_id = $die;
 

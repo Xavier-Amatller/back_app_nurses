@@ -54,12 +54,12 @@ class Dieta
     {
         // unset the owning side of the relation if necessary
         if ($registro === null && $this->registro !== null) {
-            $this->registro->setDieId(null);
+            $this->registro->setDieta(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($registro !== null && $registro->getDieId() !== $this) {
-            $registro->setDieId($this);
+        if ($registro !== null && $registro->getDieta() !== $this) {
+            $registro->setDieta($this);
         }
 
         $this->registro = $registro;

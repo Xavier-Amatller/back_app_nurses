@@ -149,9 +149,9 @@ final class DietaController extends AbstractController
         $auxiliar = $auxiliarRepository->find($auxId);
 
         // Associate Dieta with Registro
-        $registro->setPacId($patient);
+        $registro->setPaciente($patient);
         $registro->setDieta($dieta);
-        $registro->setAuxId($auxiliar);
+        $registro->setAuxiliar($auxiliar);
 
         // Persist the new Registro and Dieta
         $entityManager->persist($dieta);

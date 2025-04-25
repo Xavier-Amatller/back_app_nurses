@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Habitacion;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,15 +30,28 @@ final class HabitacionController extends AbstractController
         $rooms = $this->habitacionRep->findPaginated($page, $limit);
 
         $data = array_map(function ($room) {
+
+            if($room->getPaciente() === null) {
+                return [
+                    'hab_id' => $room->getHabId(),
+                    'hab_obs' => $room->getHabObs(),
+                    'paciente' => null,
+                ];
+            }
+
             $patient = $room->getPaciente();
+            $fechaNacimiento = $patient->getPacFechaNacimiento();
+            $edad = $this->calcularEdad($fechaNacimiento);
+            
             return [
-                'id' => $room->getId(),
                 'hab_id' => $room->getHabId(),
                 'hab_obs' => $room->getHabObs(),
                 'paciente' => $patient ? [
-                    'pac_numhistorial' => $patient->getPacNumhistorial(),
+                    'pac_id' => $patient->getId(),
                     'pac_nombre' => $patient->getPacNombre(),
                     'pac_apellidos' => $patient->getPacApellidos(),
+                    'pac_edad' => $edad,
+                    'pac_fecha_ingreso' => $patient->getPacFechaIngreso()->format('d-m-Y'),
                 ] : null,
             ];
         },  $rooms['rooms']);
@@ -48,5 +62,12 @@ final class HabitacionController extends AbstractController
             'page' => $page,
             'limit' => $limit,
         ]);
+    }
+
+    private function calcularEdad(\DateTimeInterface $fechaNacimiento): int
+    {
+        $fechaActual = new DateTime();
+        $diferencia = $fechaActual->diff($fechaNacimiento);
+        return $diferencia->y;
     }
 }

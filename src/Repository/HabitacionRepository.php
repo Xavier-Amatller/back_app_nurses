@@ -15,12 +15,13 @@ class HabitacionRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Habitacion::class);
-    }   
+    }
 
     public function findPaginated(int $page, int $limit): array
     {
+
         $query = $this->createQueryBuilder('h')
-            ->leftJoin('h.pac_numhistorial', 'p')
+            ->leftJoin('h.pac_id', 'p')
             ->addSelect('p')
             ->orderBy('h.hab_id', 'ASC')
             ->getQuery()
@@ -35,8 +36,9 @@ class HabitacionRepository extends ServiceEntityRepository
         return [
             'rooms' => $rooms,
             'totalRooms' => $totalRooms,
-        ];
+        ];  
     }
+
     //    /**
     //     * @return Habitacion[] Returns an array of Habitacion objects
     //     */

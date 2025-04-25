@@ -74,6 +74,21 @@ final class DietaController extends AbstractController
             }
             $dietaIds[] = $registro->getDieta()->getId();
         }
+        if(empty($dietaIds)){
+            return new JsonResponse(
+                [
+                    'status' => 200,
+                    'data' => [
+                        'pac_id' => $pacienteId->getId(),
+                    ],
+                    'message' => 'No diet found for this patient, only patient ID returned.',
+                ],
+                Response::HTTP_OK
+            );
+        }
+
+
+        $dietaIds = array_unique($dietaIds);
         $dieta = $dietaRepository->find($dietaIds[count($dietaIds) - 1]);
 
         return new JsonResponse(

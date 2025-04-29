@@ -27,22 +27,17 @@ final class HabitacionController extends AbstractController
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 4);
 
-        $rooms = $this->habitacionRep->findPaginated($page, $limit);
+        $data = $this->habitacionRep->findPaginated($page, $limit);
 
-        $data = array_map(function ($room) {
-
-            if($room->getPaciente() === null) {
-                return [
-                    'hab_id' => $room->getHabId(),
-                    'hab_obs' => $room->getHabObs(),
-                    'paciente' => null,
-                ];
-            }
+        $rooms = array_map(function ($room) {
 
             $patient = $room->getPaciente();
-            $fechaNacimiento = $patient->getPacFechaNacimiento();
-            $edad = $this->calcularEdad($fechaNacimiento);
-            
+
+            if ($patient) {
+                $fechaNacimiento = $patient->getPacFechaNacimiento();
+                $edad = $this->calcularEdad($fechaNacimiento);
+            }
+
             return [
                 'hab_id' => $room->getHabId(),
                 'hab_obs' => $room->getHabObs(),
@@ -54,11 +49,11 @@ final class HabitacionController extends AbstractController
                     'pac_fecha_ingreso' => $patient->getPacFechaIngreso()->format('d-m-Y'),
                 ] : null,
             ];
-        },  $rooms['rooms']);
+        },  $data['rooms']);
 
         return new JsonResponse([
-            'rooms' => $data,
-            'totalItems' => $rooms['totalRooms'],
+            'rooms' => $rooms,
+            'totalItems' => $data['totalRooms'],
             'page' => $page,
             'limit' => $limit,
         ]);
@@ -69,5 +64,35 @@ final class HabitacionController extends AbstractController
         $fechaActual = new DateTime();
         $diferencia = $fechaActual->diff($fechaNacimiento);
         return $diferencia->y;
+    }
+
+
+    #[Route('/test/rooms/show/', name: 'api_habitaciones_id', methods: ['GET'])]
+    public function show(Request $request): JsonResponse
+    {
+        $room_id = $request->query->getInt('id', 0);
+
+        $data = $this->habitacionRep->showRoom($room_id);
+
+        $room = array_map(function ($room) {
+
+            $patient = $room->getPaciente();
+            $fechaNacimiento = $patient->getPacFechaNacimiento();
+            $edad = $this->calcularEdad($fechaNacimiento);
+
+            return [
+                'hab_obs' => $room->getHabObs(),
+                'paciente' => $patient ? [
+                    'pac_id' => $patient->getId(),
+                    'pac_nombre' => $patient->getPacNombre(),
+                    'pac_apellidos' => $patient->getPacApellidos(),
+                    'pac_edad' => $edad,
+                    'pac_fecha_ingreso' => $patient->getPacFechaIngreso()->format('d-m-Y'),
+                ] : null,
+            ];
+        },  $data['room']);
+
+
+        return new JsonResponse($room);
     }
 }

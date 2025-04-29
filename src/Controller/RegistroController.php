@@ -4,13 +4,15 @@ namespace App\Controller;
 
 use App\Entity\ConstantesVitales;
 use App\Entity\Diagnostico;
+use App\Entity\Dieta;
 use App\Entity\Drenaje;
 use App\Entity\Movilizacion;
 use App\Entity\Registro;
 use App\Repository\AuxiliarRepository;
 use App\Repository\PacienteRepository;
-use App\Repository\RegistroRepository;
+use App\Repository\TiposDietaRepository;
 use App\Repository\TiposDrenajesRepository;
+use App\Repository\TiposTexturasRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -37,13 +39,43 @@ final class RegistroController extends AbstractController
         return $this->json($data);
     }
 
+    #[Route('/tipos-texturas', name: 'tipos_texturas_index', methods: ['GET'])]
+    public function getTiposTexturas(TiposTexturasRepository $tiposTexturasRepository): JsonResponse
+    {
+        $tiposTexturas = $tiposTexturasRepository->findAll();
+        $data = array_map(function ($tipo) {
+            return [
+                'id' => $tipo->getId(),
+                'ttex_desc' => $tipo->getTTextDesc(),
+            ];
+        }, $tiposTexturas);
+
+        return $this->json($data);
+    }
+
+    #[Route('/tipos-dietas', name: 'tipos_dietas_index', methods: ['GET'])]
+    public function getTiposDietas(TiposDietaRepository $tiposDietaRepository): JsonResponse
+    {
+        $tiposDietas = $tiposDietaRepository->findAll();
+        $data = array_map(function ($tipo) {
+            return [
+                'id' => $tipo->getId(),
+                'tdie_desc' => $tipo->getTdieDesc(),
+            ];
+        }, $tiposDietas);
+
+        return $this->json($data);
+    }
+
     #[Route(name: 'registros_create', methods: ['POST'])]
     public function create(
         Request $request,
         AuxiliarRepository $auxiliarRepository,
         PacienteRepository $pacienteRepository,
-        TiposDrenajesRepository $tiposDrenajesRepository, // Añadido
-        EntityManagerInterface $entityManager
+        TiposDrenajesRepository $tiposDrenajesRepository,
+        EntityManagerInterface $entityManager,
+        TiposTexturasRepository $tiposTexturasRepository,
+        TiposDietaRepository $tiposDietaRepository,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -67,6 +99,17 @@ final class RegistroController extends AbstractController
         // Validar que si se proporciona dre_debito, tdre_id sea obligatorio
         if (!empty($data['drenaje']['dre_debito']) && empty($data['drenaje']['tdre_id'])) {
             return $this->json(['error' => 'El tipo de drenaje es obligatorio si se proporciona un débito'], 400);
+        }
+
+        // Validar dietas
+        if (!empty($data['dieta']['die_ttext'])) {
+            if (
+                empty($data['dieta']['tipos_dietas']) ||
+                !isset($data['dieta']['die_autonomo']) ||
+                !isset($data['dieta']['die_protesi'])
+            ) {
+                return $this->json(['error' => 'Todos los campos de dieta son obligatorios si se proporciona una textura'], 400);
+            }
         }
 
         // Obtener el auxiliar
@@ -121,6 +164,31 @@ final class RegistroController extends AbstractController
             $drenaje->setTipoDrenaje($tipoDrenaje);
         }
 
+        // Crear dieta (opcional)
+        $dieta = null;
+        if (!empty($data['dieta']['die_ttext'])) {
+            $dieta = new Dieta();
+
+            // Asignar textura
+            $tipoTextura = $tiposTexturasRepository->find($data['dieta']['die_ttext']);
+            if (!$tipoTextura) {
+                return $this->json(['error' => 'Tipo de textura no encontrado'], 404);
+            }
+            $dieta->setDieTText($tipoTextura);
+
+            // Asignar tipos de dieta
+            foreach ($data['dieta']['tipos_dietas'] as $tipoDietaId) {
+                $tipoDieta = $tiposDietaRepository->find($tipoDietaId);
+                if (!$tipoDieta) {
+                    return $this->json(['error' => 'Tipo de dieta no encontrado: ' . $tipoDietaId], 404);
+                }
+                $dieta->addTiposDieta($tipoDieta);
+            }
+
+            // Asignar campos booleanos
+            $dieta->setDieAutonomo($data['dieta']['die_autonomo']);
+            $dieta->setDieProtesi($data['dieta']['die_protesi']);
+        }
         // Crear el registro
         $registro = new Registro();
         $registro->setAuxiliar($auxiliar);
@@ -130,7 +198,7 @@ final class RegistroController extends AbstractController
         $registro->setMovilizacion($movilizacion);
         $registro->setDiagnostico($diagnostico);
         $registro->setDrenaje($drenaje);
-        $registro->setDieta(null);
+        $registro->setDieta($dieta);
 
         // Guardar el registro usando el EntityManager
         $entityManager->persist($constantesVitales);

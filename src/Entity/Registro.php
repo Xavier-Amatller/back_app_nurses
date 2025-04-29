@@ -42,6 +42,10 @@ class Registro
     #[ORM\JoinColumn(name: 'dia_id', referencedColumnName: 'id', nullable: true)]
     private ?Diagnostico $dia_id = null;
 
+    #[ORM\OneToOne(targetEntity: Drenaje::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'dre_id', referencedColumnName: 'id', nullable: true)]
+    private ?Drenaje $dre_id = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -88,7 +92,7 @@ class Registro
         return $this->cv_id;
     }
 
-    public function setCosntantesVitales(?ConstantesVitales $cv_id): static
+    public function setConstantesVitales(?ConstantesVitales $cv_id): static
     {
         $this->cv_id = $cv_id;
 
@@ -127,6 +131,18 @@ class Registro
     public function setDiagnostico(?Diagnostico $dia_id): static
     {
         $this->dia_id = $dia_id;
+
+        return $this;
+    }
+
+    public function getDrenaje(): ?Drenaje
+    {
+        return $this->dre_id;
+    }
+
+    public function setDrenaje(?Drenaje $dre_id): static
+    {
+        $this->dre_id = $dre_id;
 
         return $this;
     }

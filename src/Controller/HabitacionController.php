@@ -84,9 +84,17 @@ final class HabitacionController extends AbstractController
                 'hab_obs' => $room->getHabObs(),
                 'paciente' => $patient ? [
                     'pac_id' => $patient->getId(),
+                    'pac_num_historial' => $patient->getPacNumHistorial(),
                     'pac_nombre' => $patient->getPacNombre(),
                     'pac_apellidos' => $patient->getPacApellidos(),
                     'pac_edad' => $edad,
+                    'pac_fecha_nacimiento' => $patient->getPacFechaNacimiento()->format('d-m-Y'),
+                    'pac_lengua_materna' => $patient->getPacLenguaMaterna(),
+                    'pac_direccion_completa' => $patient->getPacDireccionCompleta(),
+                    'pac_antecedentes' => $patient->getPacAntecedentes(),
+                    'pac_alergias' => $patient->getPacAlergias(),
+                    'pac_nombre_cuidador' => $patient->getPacNombreCuidador(),
+                    'pac_telefono_cuidador' => $patient->getPacTelefonoCuidador(),
                     'pac_fecha_ingreso' => $patient->getPacFechaIngreso()->format('d-m-Y'),
                 ] : null,
             ];

@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-// #[Route('/api/room')]
-// #[IsGranted('ROLE_AUXILIAR')]
+#[Route('/api/rooms')]
+#[IsGranted('ROLE_AUXILIAR')]
 final class HabitacionController extends AbstractController
 {
 
@@ -26,7 +26,7 @@ final class HabitacionController extends AbstractController
     // #[Route('', name: 'api_habitaciones_index', methods: ['GET'])]
     // public function index(Request $request): JsonResponse
 
-    #[Route('/test/rooms', name: 'api_habitaciones', methods: ['GET'])]
+    #[Route('', name: 'api_habitaciones', methods: ['GET'])]
 
     public function getHabitaciones(Request $request): JsonResponse
     {
@@ -77,7 +77,7 @@ final class HabitacionController extends AbstractController
     // #[Route('{id}', name: 'api_habitaciones_show', methods: ['GET'])]
     // public function show(Request $request): JsonResponse
 
-    #[Route('/test/rooms/show/', name: 'api_habitaciones_id', methods: ['GET'])]
+    #[Route('/show', name: 'api_habitaciones_id', methods: ['GET'])]
     public function show(Request $request): JsonResponse
     {
         $room_id = $request->query->getInt('id', 0);

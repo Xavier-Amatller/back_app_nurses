@@ -25,6 +25,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_AUXILIAR')]
 final class RegistroController extends AbstractController
 {
+    private $RegistroRep;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->RegistroRep = $entityManager->getRepository(Registro::class);
+    }
+
     #[Route('/tipos-drenajes', name: 'tipos_drenajes_index', methods: ['GET'])]
     public function getTiposDrenajes(TiposDrenajesRepository $tiposDrenajesRepository): JsonResponse
     {
@@ -224,5 +231,62 @@ final class RegistroController extends AbstractController
         ];
 
         return $this->json($responseData, 201);
+    }
+
+
+    #[Route('/last', name: 'get_last_record', methods: ['GET'])]
+    public function getLastRecordByPatient(Request $request): JsonResponse
+    {
+        $pac_id = $request->query->getInt('id');
+
+        $data = $this->RegistroRep->lastRegistro($pac_id);
+
+        $last_registro = array_map(function ($reg) {
+
+            $cv = $reg->getConstantesVitales();
+            $die = $reg->getDieta();
+            $mov = $reg->getMovilizacion();
+            $dia = $reg->getDiagnostico();
+            $dre = $reg->getDrenaje();
+
+            return [
+                'reg_timestamp' => $reg->getRegTimestamp()->format('d/m/Y H:i:s'),
+                'cv' => $cv ? [
+                    'cv_ta_sistolica' => $cv->getCvTaSistolica(),
+                    'cv_ta_diastolica' => $cv->getCvTaDiastolica(),
+                    'cv_frequencia_respiratoria' => $cv->getCvFrequenciaRespiratoria(),
+                    'cv_pulso' => $cv->getCvPulso(),
+                    'cv_temperatura' => $cv->getCvTemperatura(),
+                    'cv_saturacion_oxigeno' => $cv->getCvSaturacionOxigeno(),
+                    'cv_talla' => $cv->getCvTalla(),
+                    'cv_diuresis' => $cv->getCvDiuresis(),
+                    'cv_deposiciones' => $cv->getCvDeposiciones(),
+                    'cv_stp' => $cv->getCvStp(),
+                ] : null,
+                'die' => $die ? [
+                    'die_ttext' => $die->getDieTText()->getTTextDesc(),
+                    'die_autonomo' => $die->isDieAutonomo(),
+                    'die_protesi' => $die->isDieProtesi(),
+                ] : null,
+                'mov' => $mov ? [
+                    'mov_sedestacion' => $mov->isMovSedestacion(),
+                    'mov_ajuda_deambulacion' => $mov->isMovAjudaDeambulacion(),
+                    'mov_ajuda_descripcion' => $mov->getMovAjudaDescripcion(),
+                    'mov_cambios' => $mov->getMovCambios(),
+                    'mov_decubitos' => $mov->getMovDecubitos(),
+                ] : null,
+                'dia' => $dia ? [
+                    'dia_diagnostico' => $dia->getDiaDiagnostico(),
+                    'dia_motivo' => $dia->getDiaMotivo(),
+                ] : null,
+                'dre' => $dre ? [
+                    'dre_debito' => $dre->getDreDebito(),
+                    'tdre_desc' => $dre->getTipoDrenaje()->getTDreDesc(),
+                ] : null,
+
+            ];
+        },  $data);
+
+        return $this->json($last_registro);
     }
 }

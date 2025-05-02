@@ -225,22 +225,4 @@ final class RegistroController extends AbstractController
 
         return $this->json($responseData, 201);
     }
-
-    #[Route('/{id}', name: 'app_registro_show', methods: ['GET'])]
-    public function show(Registro $registro): Response
-    {
-        return $this->json(['message' => 'Show Not implemented'], 201);
-    }
-
-    #[Route('/{id}/edit', name: 'app_registro_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Registro $registro, EntityManagerInterface $entityManager): Response
-    {
-        return $this->json(['message' => 'Edit Not implemented'], 201);
-    }
-
-    #[Route('/{id}', name: 'app_registro_delete', methods: ['POST'])]
-    public function delete(Request $request, Registro $registro, EntityManagerInterface $entityManager): Response
-    {
-        return $this->json(['message' => 'Delete Not implemented'], 201);
-    }
 }

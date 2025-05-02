@@ -8,9 +8,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+// #[Route('/api/room')]
+// #[IsGranted('ROLE_AUXILIAR')]
 final class HabitacionController extends AbstractController
 {
 
@@ -21,7 +23,11 @@ final class HabitacionController extends AbstractController
         $this->habitacionRep = $entityManager->getRepository(Habitacion::class);
     }
 
+    // #[Route('', name: 'api_habitaciones_index', methods: ['GET'])]
+    // public function index(Request $request): JsonResponse
+
     #[Route('/test/rooms', name: 'api_habitaciones', methods: ['GET'])]
+
     public function getHabitaciones(Request $request): JsonResponse
     {
         $page = $request->query->getInt('page', 1);
@@ -59,6 +65,7 @@ final class HabitacionController extends AbstractController
         ]);
     }
 
+    // private function calcAge(\DateTimeInterface $fechaNacimiento): int
     private function calcularEdad(\DateTimeInterface $fechaNacimiento): int
     {
         $fechaActual = new DateTime();
@@ -67,12 +74,15 @@ final class HabitacionController extends AbstractController
     }
 
 
+    // #[Route('{id}', name: 'api_habitaciones_show', methods: ['GET'])]
+    // public function show(Request $request): JsonResponse
+
     #[Route('/test/rooms/show/', name: 'api_habitaciones_id', methods: ['GET'])]
     public function show(Request $request): JsonResponse
     {
         $room_id = $request->query->getInt('id', 0);
 
-        $data = $this->habitacionRep->showRoom($room_id);
+        $data = $this->habitacionRep->findBy(['hab_id' => $room_id]);
 
         $room = array_map(function ($room) {
 
@@ -98,7 +108,7 @@ final class HabitacionController extends AbstractController
                     'pac_fecha_ingreso' => $patient->getPacFechaIngreso()->format('d-m-Y'),
                 ] : null,
             ];
-        },  $data['room']);
+        },  $data);
 
 
         return new JsonResponse($room);

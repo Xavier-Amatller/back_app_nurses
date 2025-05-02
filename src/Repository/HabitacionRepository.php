@@ -39,16 +39,14 @@ class HabitacionRepository extends ServiceEntityRepository
         ];
     }
 
-    public function showRoom(string $room_id)
-    {
-        $room = $this->findBy(['hab_id' => $room_id]);
+    // public function showRoom(string $room_id)
+    // {
+    //     $room = $this->findBy(['hab_id' => $room_id]);
 
-        return [
-            'room' => $room
-        ];
-    }
-
-
+    //     return [
+    //         'room' => $room
+    //     ];
+    // }
 
     //    /**
     //     * @return Habitacion[] Returns an array of Habitacion objects

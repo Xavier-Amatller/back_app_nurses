@@ -23,12 +23,9 @@ final class HabitacionController extends AbstractController
         $this->habitacionRep = $entityManager->getRepository(Habitacion::class);
     }
 
-    // #[Route('', name: 'api_habitaciones_index', methods: ['GET'])]
-    // public function index(Request $request): JsonResponse
+    #[Route('', name: 'api_habitaciones_index', methods: ['GET'])]
 
-    #[Route('', name: 'api_habitaciones', methods: ['GET'])]
-
-    public function getHabitaciones(Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 4);
@@ -41,7 +38,7 @@ final class HabitacionController extends AbstractController
 
             if ($patient) {
                 $fechaNacimiento = $patient->getPacFechaNacimiento();
-                $edad = $this->calcularEdad($fechaNacimiento);
+                $edad = $this->calcAge($fechaNacimiento);
             }
 
             return [
@@ -65,19 +62,14 @@ final class HabitacionController extends AbstractController
         ]);
     }
 
-    // private function calcAge(\DateTimeInterface $fechaNacimiento): int
-    private function calcularEdad(\DateTimeInterface $fechaNacimiento): int
+    private function calcAge(\DateTimeInterface $fechaNacimiento): int
     {
         $fechaActual = new DateTime();
         $diferencia = $fechaActual->diff($fechaNacimiento);
         return $diferencia->y;
     }
 
-
-    // #[Route('{id}', name: 'api_habitaciones_show', methods: ['GET'])]
-    // public function show(Request $request): JsonResponse
-
-    #[Route('/show', name: 'api_habitaciones_id', methods: ['GET'])]
+    #[Route('/show', name: 'api_habitaciones_show', methods: ['GET'])]
     public function show(Request $request): JsonResponse
     {
         $room_id = $request->query->getInt('id', 0);
@@ -88,7 +80,7 @@ final class HabitacionController extends AbstractController
 
             $patient = $room->getPaciente();
             $fechaNacimiento = $patient->getPacFechaNacimiento();
-            $edad = $this->calcularEdad($fechaNacimiento);
+            $edad = $this->calcAge($fechaNacimiento);
 
             return [
                 'hab_obs' => $room->getHabObs(),

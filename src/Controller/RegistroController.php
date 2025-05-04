@@ -242,7 +242,7 @@ final class RegistroController extends AbstractController
 
         $data = $this->RegistroRep->lastRegistro($pac_id);
 
-        $last_registro = array_map(function ($reg) {
+        $lastRegistro = array_map(function ($reg) {
 
             $cv = $reg->getConstantesVitales();
             $die = $reg->getDieta();
@@ -294,8 +294,6 @@ final class RegistroController extends AbstractController
             ];
         },  $data);
 
-        
-
-        return $this->json($last_registro);
+        return $this->json($lastRegistro);
     }
 }

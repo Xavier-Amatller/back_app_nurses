@@ -18,6 +18,89 @@ class RegistroRepository extends ServiceEntityRepository
 
     public function lastRegistro(int $pac_id): array
     {
+
+        $query = $this->createQueryBuilder('r')
+            ->addSelect('c')
+            ->addSelect('d')
+            ->addSelect('m')
+            ->addSelect('di')
+            ->addSelect('dr')
+            ->leftJoin('r.cv_id', 'c')
+            ->leftJoin('r.die_id', 'd')
+            ->leftJoin('r.mov_id', 'm')
+            ->leftJoin('r.dia_id', 'di')
+            ->leftJoin('r.dre_id', 'dr')
+            ->andWhere('r.pac_id = :pacId')
+            ->setParameter('pacId', $pac_id)
+            ->orderBy('r.reg_timestamp', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery();
+
+        $latestRegistro = $query->getOneOrNullResult();
+
+        if (!$latestRegistro) {
+            return ['lastRegistro' => null];
+        }
+
+        $DefRegistro = clone $latestRegistro;
+
+        $previousRegistros = $this->createQueryBuilder('r')
+            ->addSelect('c')
+            ->addSelect('d')
+            ->addSelect('m')
+            ->addSelect('di')
+            ->addSelect('dr')
+            ->leftJoin('r.cv_id', 'c')
+            ->leftJoin('r.die_id', 'd')
+            ->leftJoin('r.mov_id', 'm')
+            ->leftJoin('r.dia_id', 'di')
+            ->leftJoin('r.dre_id', 'dr')
+            ->andWhere('r.pac_id = :pacId')
+            ->andWhere('r.id != :currentId')
+            ->setParameter('pacId', $pac_id)
+            ->setParameter('currentId', $DefRegistro->getId())
+            ->orderBy('r.reg_timestamp', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        if (empty($previousRegistros)) {
+            return ['lastRegistro' => $DefRegistro];
+        }
+
+        $fields = [
+            'cv_id' => 'getConstantesVitales',
+            'die_id' => 'getDieta',
+            'mov_id' => 'getMovilizacion',
+            'dia_id' => 'getDiagnostico',
+            'dre_id' => 'getDrenaje',
+        ];
+
+        $setters = [
+            'cv_id' => 'setConstantesVitales',
+            'die_id' => 'setDieta',
+            'mov_id' => 'setMovilizacion',
+            'dia_id' => 'setDiagnostico',
+            'dre_id' => 'setDrenaje',
+        ];
+
+
+        foreach ($fields as $field => $getter) {
+            if ($DefRegistro->$getter() === null) {
+                foreach ($previousRegistros as $previousRegistro) {
+                    $value = $previousRegistro->$getter();
+                    if ($value !== null) {
+                        $setter = $setters[$field];
+                        $DefRegistro->$setter($value);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return ['lastRegistro' => $DefRegistro];
+
+        /* public function lastRegistro(int $pac_id): array
+    {
         $query = $this->createQueryBuilder('r')
             ->addSelect('c')
             ->addSelect('d')
@@ -40,30 +123,32 @@ class RegistroRepository extends ServiceEntityRepository
         return [
             'lastRegistro' => $registro
         ];
+    } */
+
+
+        //    /**
+        //     * @return Registro[] Returns an array of Registro objects
+        //     */
+        //    public function findByExampleField($value): array
+        //    {
+        //        return $this->createQueryBuilder('r')
+        //            ->andWhere('r.exampleField = :val')
+        //            ->setParameter('val', $value)
+        //            ->orderBy('r.id', 'ASC')
+        //            ->setMaxResults(10)
+        //            ->getQuery()
+        //            ->getResult()
+        //        ;
+        //    }
+
+        //    public function findOneBySomeField($value): ?Registro
+        //    {
+        //        return $this->createQueryBuilder('r')
+        //            ->andWhere('r.exampleField = :val')
+        //            ->setParameter('val', $value)
+        //            ->getQuery()
+        //            ->getOneOrNullResult()
+        //        ;
+        //    }
     }
-
-    //    /**
-    //     * @return Registro[] Returns an array of Registro objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Registro
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

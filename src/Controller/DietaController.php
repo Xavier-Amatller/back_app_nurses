@@ -62,7 +62,7 @@ final class DietaController extends AbstractController
     {
 
         $roomId = $id;
-        $room = $habitacionRepository->find($roomId);
+        $room = $habitacionRepository->findOneBy(['hab_id' => $roomId]);
         $pacienteId = $room->getPaciente();
         $paciente = $pacienteRepository->find($pacienteId);
         $registros = $paciente->getRegistros();
@@ -167,6 +167,7 @@ final class DietaController extends AbstractController
         $registro->setPaciente($patient);
         $registro->setDieta($dieta);
         $registro->setAuxiliar($auxiliar);
+        $registro->setRegTimestamp(new \DateTime());
 
         // Persist the new Registro and Dieta
         $entityManager->persist($dieta);

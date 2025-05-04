@@ -8,6 +8,7 @@ use App\Entity\Dieta;
 use App\Entity\Drenaje;
 use App\Entity\Movilizacion;
 use App\Entity\Registro;
+use App\Entity\TiposDieta;
 use App\Repository\AuxiliarRepository;
 use App\Repository\PacienteRepository;
 use App\Repository\TiposDietaRepository;
@@ -267,6 +268,12 @@ final class RegistroController extends AbstractController
                     'die_ttext' => $die->getDieTText()->getTTextDesc(),
                     'die_autonomo' => $die->isDieAutonomo(),
                     'die_protesi' => $die->isDieProtesi(),
+                    'die_tdieta' => $die->getTiposDietas()->map(function (TiposDieta $tipo) {
+                        return [
+                            'id' => $tipo->getId(),
+                            'descripcion' => $tipo->getTDieDesc(),
+                        ];
+                    })->toArray(),
                 ] : null,
                 'mov' => $mov ? [
                     'mov_sedestacion' => $mov->isMovSedestacion(),
@@ -286,6 +293,8 @@ final class RegistroController extends AbstractController
 
             ];
         },  $data);
+
+        
 
         return $this->json($last_registro);
     }

@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/registro')]
-#[IsGranted('ROLE_AUXILIAR')]
+#[IsGranted('ROLE_AUXILIAR')] 
 final class RegistroController extends AbstractController
 {
     private $RegistroRep;
@@ -241,6 +241,10 @@ final class RegistroController extends AbstractController
         $pac_id = $request->query->getInt('id');
 
         $data = $this->RegistroRep->lastRegistro($pac_id);
+
+        if ($data['lastRegistro'] === null) {
+            return $this->json(['error' => 'No se encontraron registros para el paciente'], Response::HTTP_NOT_FOUND);
+        }
 
         $lastRegistro = array_map(function ($reg) {
 

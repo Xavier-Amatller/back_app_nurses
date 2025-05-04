@@ -91,7 +91,6 @@ final class RegistroController extends AbstractController
         if (
             !isset($data['aux_id']) ||
             !isset($data['pac_id']) ||
-            !isset($data['reg_fecha']) ||
             !isset($data['reg_obs']) ||
             !isset($data['constantes_vitales']) ||
             !isset($data['constantes_vitales']['cv_ta_diastolica']) ||
@@ -201,7 +200,7 @@ final class RegistroController extends AbstractController
         $registro = new Registro();
         $registro->setAuxiliar($auxiliar);
         $registro->setPaciente($paciente);
-        $registro->setRegTimestamp(new \DateTime($data['reg_fecha']));
+        $registro->setRegTimestamp(new \DateTime());
         $registro->setConstantesVitales($constantesVitales);
         $registro->setMovilizacion($movilizacion);
         $registro->setDiagnostico($diagnostico);

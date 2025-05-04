@@ -18,12 +18,14 @@ class Drenaje
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $dre_debito = null;
 
-    #[ORM\OneToOne(targetEntity: TiposDrenajes::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'tdre_id', referencedColumnName: 'id', nullable: true)]
+    #[ORM\ManyToOne(inversedBy: 'drenajes')]
+    #[ORM\JoinColumn(name: 'tdre_id', nullable: false)]
     private ?TiposDrenajes $tdre_id = null;
 
     #[ORM\OneToOne(mappedBy: 'dre_id', cascade: ['persist', 'remove'])]
     private ?Registro $registro = null;
+
+
 
     public function getId(): ?int
     {

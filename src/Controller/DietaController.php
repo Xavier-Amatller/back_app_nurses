@@ -63,6 +63,15 @@ final class DietaController extends AbstractController
 
         $roomId = $id;
         $room = $habitacionRepository->findOneBy(['hab_id' => $roomId]);
+        if ($room->getPaciente() == null) {
+            return new JsonResponse(
+                [
+                    'status' => 404,
+                    'message' => 'noPatient',
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
         $pacienteId = $room->getPaciente();
         $paciente = $pacienteRepository->find($pacienteId);
         $registros = $paciente->getRegistros();
@@ -81,7 +90,7 @@ final class DietaController extends AbstractController
                     'data' => [
                         'pac_id' => $pacienteId->getId(),
                     ],
-                    'message' => 'No diet found for this patient, only patient ID returned.',
+                    'message' => 'noDiet',
                 ],
                 Response::HTTP_OK
             );

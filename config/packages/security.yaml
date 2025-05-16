@@ -28,7 +28,7 @@ security:
     # Control de acceso
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS } # Permitir acceso público al login
-        - { path: ^/api, roles: ROLE_AUXILIAR } # Proteger todas las rutas /api con el rol ROLE_AUXILIAR
+        # - { path: ^/api, roles: ROLE_ADMIN } # Proteger todas las rutas /api con el rol ROLE_AUXILIAR o ROLE_ADMIN
 
 # Configuración específica para el entorno de pruebas
 when@test:

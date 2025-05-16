@@ -3,79 +3,82 @@
 namespace App\Controller;
 
 use App\Entity\Paciente;
-use App\Form\PacienteType;
-use App\Repository\PacienteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/paciente')]
-final class PacienteController extends AbstractController
+#[Route('/api/pacientes')]
+#[IsGranted('ROLE_ADMIN')] 
+class PacienteController extends AbstractController
 {
-    #[Route(name: 'app_paciente_index', methods: ['GET'])]
-    public function index(PacienteRepository $pacienteRepository): Response
+    private $patientRep;
+
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        return $this->render('paciente/index.html.twig', [
-            'pacientes' => $pacienteRepository->findAll(),
-        ]);
+        $this->patientRep = $entityManager->getRepository(Paciente::class);
     }
 
-    #[Route('/new', name: 'app_paciente_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('', name: 'api_create_patient', methods: ['POST'])]
+    public function createPatient(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $paciente = new Paciente();
-        $form = $this->createForm(PacienteType::class, $paciente);
-        $form->handleRequest($request);
+        $this->denyAccessUnlessGranted('ROLE_ADMIN'); // Solo administradores pueden crear pacientes
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($paciente);
-            $entityManager->flush();
+        $data = json_decode($request->getContent(), true);
+        $pacNumHistorial = $data['pac_num_historial'] ?? null;
+        $pacNombre = $data['pac_nombre'] ?? null;
+        $pacApellidos = $data['pac_apellidos'] ?? null;
+        $pacFechaNacimiento = $data['pac_fecha_nacimiento'] ? new \DateTime($data['pac_fecha_nacimiento']) : null;
+        $pacDireccionCompleta = $data['pac_direccion_completa'] ?? null;
+        $pacLenguaMaterna = $data['pac_lengua_materna'] ?? null;
+        $pacAntecedentes = $data['pac_antecedentes'] ?? null;
+        $pacAlergias = $data['pac_alergias'] ?? null;
+        $pacNombreCuidador = $data['pac_nombre_cuidador'] ?? null;
+        $pacTelefonoCuidador = $data['pac_telefono_cuidador'] ?? null;
+        $pacFechaIngreso = $data['pac_fecha_ingreso'] ? new \DateTime($data['pac_fecha_ingreso']) : null;
+        $pacTimestamp = $data['pac_timestamp'] ? new \DateTime($data['pac_timestamp']) : new \DateTime();
 
-            return $this->redirectToRoute('app_paciente_index', [], Response::HTTP_SEE_OTHER);
+        if (
+            !$pacNumHistorial ||
+            !$pacNombre ||
+            !$pacApellidos ||
+            !$pacFechaNacimiento ||
+            !$pacDireccionCompleta ||
+            !$pacLenguaMaterna ||
+            !$pacAntecedentes ||
+            !$pacAlergias ||
+            !$pacNombreCuidador ||
+            !$pacTelefonoCuidador ||
+            !$pacFechaIngreso
+        ) {
+            return new JsonResponse(['error' => 'Datos incompletos'], 400);
         }
 
-        return $this->render('paciente/new.html.twig', [
-            'paciente' => $paciente,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_paciente_show', methods: ['GET'])]
-    public function show(Paciente $paciente): Response
-    {
-        return $this->render('paciente/show.html.twig', [
-            'paciente' => $paciente,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_paciente_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Paciente $paciente, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(PacienteType::class, $paciente);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_paciente_index', [], Response::HTTP_SEE_OTHER);
+        // Verificar si el número de historial ya existe
+        $existingPatient = $this->patientRep->findOneBy(['pac_num_historial' => $pacNumHistorial]);
+        if ($existingPatient) {
+            return new JsonResponse(['error' => 'El número de historial ya existe'], 409);
         }
 
-        return $this->render('paciente/edit.html.twig', [
-            'paciente' => $paciente,
-            'form' => $form,
-        ]);
-    }
+        $patient = new Paciente();
+        $patient->setPacNumhistorial($pacNumHistorial);
+        $patient->setPacNombre($pacNombre);
+        $patient->setPacApellidos($pacApellidos);
+        $patient->setPacFechaNacimiento($pacFechaNacimiento);
+        $patient->setPacDireccionCompleta($pacDireccionCompleta);
+        $patient->setPacLenguaMaterna($pacLenguaMaterna);
+        $patient->setPacAntecedentes($pacAntecedentes);
+        $patient->setPacAlergias($pacAlergias);
+        $patient->setPacNombreCuidador($pacNombreCuidador);
+        $patient->setPacTelefonoCuidador($pacTelefonoCuidador);
+        $patient->setPacFechaIngreso($pacFechaIngreso);
+        $patient->setPacTimestamp($pacTimestamp);
 
-    #[Route('/{id}', name: 'app_paciente_delete', methods: ['POST'])]
-    public function delete(Request $request, Paciente $paciente, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$paciente->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($paciente);
-            $entityManager->flush();
-        }
+        $entityManager->persist($patient);
+        $entityManager->flush();
 
-        return $this->redirectToRoute('app_paciente_index', [], Response::HTTP_SEE_OTHER);
+        return new JsonResponse(['message' => 'Paciente creado con éxito', 'id' => $patient->getId()], 201);
     }
 }

@@ -36,6 +36,9 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'aux_id')]
     private Collection $registros;
 
+    #[ORM\Column(type: "json", nullable: true)]
+    private array $roles = ['ROLE_AUXILIAR']; // Campo para almacenar roles, por defecto ROLE_AUXILIAR
+
     public function __construct()
     {
         $this->registros = new ArrayCollection();
@@ -89,16 +92,22 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setAuxPassword(string $aux_password): static
     {
-        $this->aux_password = $aux_password;
+        $this->aux_password = $aux_password; 
 
         return $this;
     }
 
-
     // Métodos requeridos por UserInterface
     public function getRoles(): array
     {
-        return ['ROLE_AUXILIAR'];
+        return $this->roles ?? ['ROLE_AUXILIAR']; 
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 
     public function getPassword(): ?string
@@ -113,7 +122,6 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUsername(): string
     {
-        // Mantén esto por compatibilidad, pero no es obligatorio si usas getUserIdentifier
         return $this->aux_num_trabajador ?? '';
     }
 
@@ -122,10 +130,8 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
         // No hay nada que borrar en este caso
     }
 
-    // Método obligatorio desde Symfony 5.3+
     public function getUserIdentifier(): string
     {
-        // Usamos aux_num_trabajador como identificador único
         return $this->aux_num_trabajador ?? '';
     }
 
@@ -150,7 +156,6 @@ class Auxiliar implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeRegistro(Registro $registro): static
     {
         if ($this->registros->removeElement($registro)) {
-            // set the owning side to null (unless already changed)
             if ($registro->getAuxiliar() === $this) {
                 $registro->setAuxiliar(null);
             }

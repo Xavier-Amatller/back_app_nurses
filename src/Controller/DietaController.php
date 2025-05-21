@@ -159,6 +159,7 @@ final class DietaController extends AbstractController
             if ($dieta) {
                 $response[] = [
                     'id' => $dieta->getId(),
+                    'timestamp' => $registro->getRegTimestamp()->format('Y-m-d H:i:s'),
                     'Die_Autonomo' => $dieta->isDieAutonomo(),
                     'Die_Protesi' => $dieta->isDieProtesi(),
                     'Die_TText' => $dieta->getDieTText() ? [

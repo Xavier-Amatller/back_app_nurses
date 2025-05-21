@@ -13,6 +13,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/rooms')]
 #[IsGranted('ROLE_AUXILIAR')]
+// #[IsGranted('ROLE_ADMIN')]
 final class HabitacionController extends AbstractController
 {
 
@@ -72,9 +73,9 @@ final class HabitacionController extends AbstractController
     #[Route('/show', name: 'api_habitaciones_show', methods: ['GET'])]
     public function show(Request $request): JsonResponse
     {
-        $room_id = $request->query->getInt('id', 0);
+        $hab_id = $request->query->getInt('hab_id', 0);
 
-        $data = $this->habitacionRep->findBy(['hab_id' => $room_id]);
+        $data = $this->habitacionRep->findBy(['hab_id' => $hab_id]);
 
         $room = array_map(function ($room) {
 
@@ -83,6 +84,7 @@ final class HabitacionController extends AbstractController
             $edad = $this->calcAge($fechaNacimiento);
 
             return [
+                'hab_id' => $room->getHabId(),
                 'hab_obs' => $room->getHabObs(),
                 'paciente' => $patient
                     ? [

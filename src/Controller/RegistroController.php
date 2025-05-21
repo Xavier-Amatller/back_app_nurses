@@ -308,7 +308,7 @@ final class RegistroController extends AbstractController
         $pac_id = $request->query->getInt('pac_id');
 
         $data = $registroRepository->findBy(['pac_id' => $pac_id]);
-        
+
         if (empty($data)) {
             return $this->json(['error' => 'No se encontraron registros para el paciente'], Response::HTTP_NOT_FOUND);
         }
@@ -325,45 +325,45 @@ final class RegistroController extends AbstractController
             $dre = $reg->getDrenaje();
 
             return [
-            'reg_timestamp' => $reg->getRegTimestamp()->format('d/m/Y H:i:s'),
-            'cv' => $cv ? [
-                'cv_ta_sistolica' => $cv->getCvTaSistolica(),
-                'cv_ta_diastolica' => $cv->getCvTaDiastolica(),
-                'cv_frequencia_respiratoria' => $cv->getCvFrequenciaRespiratoria(),
-                'cv_pulso' => $cv->getCvPulso(),
-                'cv_temperatura' => $cv->getCvTemperatura(),
-                'cv_saturacion_oxigeno' => $cv->getCvSaturacionOxigeno(),
-                'cv_talla' => $cv->getCvTalla(),
-                'cv_diuresis' => $cv->getCvDiuresis(),
-                'cv_deposiciones' => $cv->getCvDeposiciones(),
-                'cv_stp' => $cv->getCvStp(),
-            ] : null,
-            'die' => $die ? [
-                'die_ttext' => $die->getDieTText()->getTTextDesc(),
-                'die_autonomo' => $die->isDieAutonomo(),
-                'die_protesi' => $die->isDieProtesi(),
-                'die_tdieta' => $die->getTiposDietas()->map(function (TiposDieta $tipo) {
-                return [
-                    'id' => $tipo->getId(),
-                    'descripcion' => $tipo->getTDieDesc(),
-                ];
-                })->toArray(),
-            ] : null,
-            'mov' => $mov ? [
-                'mov_sedestacion' => $mov->isMovSedestacion(),
-                'mov_ajuda_deambulacion' => $mov->isMovAjudaDeambulacion(),
-                'mov_ajuda_descripcion' => $mov->getMovAjudaDescripcion(),
-                'mov_cambios' => $mov->getMovCambios(),
-                'mov_decubitos' => $mov->getMovDecubitos(),
-            ] : null,
-            'dia' => $dia ? [
-                'dia_diagnostico' => $dia->getDiaDiagnostico(),
-                'dia_motivo' => $dia->getDiaMotivo(),
-            ] : null,
-            'dre' => $dre ? [
-                'dre_debito' => $dre->getDreDebito(),
-                'tdre_desc' => $dre->getTipoDrenaje()->getTDreDesc(),
-            ] : null,
+                'reg_timestamp' => $reg->getRegTimestamp()->format('d/m/Y H:i:s'),
+                'cv' => $cv ? [
+                    'cv_ta_sistolica' => $cv->getCvTaSistolica(),
+                    'cv_ta_diastolica' => $cv->getCvTaDiastolica(),
+                    'cv_frequencia_respiratoria' => $cv->getCvFrequenciaRespiratoria(),
+                    'cv_pulso' => $cv->getCvPulso(),
+                    'cv_temperatura' => $cv->getCvTemperatura(),
+                    'cv_saturacion_oxigeno' => $cv->getCvSaturacionOxigeno(),
+                    'cv_talla' => $cv->getCvTalla(),
+                    'cv_diuresis' => $cv->getCvDiuresis(),
+                    'cv_deposiciones' => $cv->getCvDeposiciones(),
+                    'cv_stp' => $cv->getCvStp(),
+                ] : null,
+                'die' => $die ? [
+                    'die_ttext' => $die->getDieTText()->getTTextDesc(),
+                    'die_autonomo' => $die->isDieAutonomo(),
+                    'die_protesi' => $die->isDieProtesi(),
+                    'die_tdieta' => $die->getTiposDietas()->map(function (TiposDieta $tipo) {
+                        return [
+                            'id' => $tipo->getId(),
+                            'descripcion' => $tipo->getTDieDesc(),
+                        ];
+                    })->toArray(),
+                ] : null,
+                'mov' => $mov ? [
+                    'mov_sedestacion' => $mov->isMovSedestacion(),
+                    'mov_ajuda_deambulacion' => $mov->isMovAjudaDeambulacion(),
+                    'mov_ajuda_descripcion' => $mov->getMovAjudaDescripcion(),
+                    'mov_cambios' => $mov->getMovCambios(),
+                    'mov_decubitos' => $mov->getMovDecubitos(),
+                ] : null,
+                'dia' => $dia ? [
+                    'dia_diagnostico' => $dia->getDiaDiagnostico(),
+                    'dia_motivo' => $dia->getDiaMotivo(),
+                ] : null,
+                'dre' => $dre ? [
+                    'dre_debito' => $dre->getDreDebito(),
+                    'tdre_desc' => $dre->getTipoDrenaje()->getTDreDesc(),
+                ] : null,
 
             ];
         }, $data);

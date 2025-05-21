@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Registro;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -98,8 +99,8 @@ class RegistroRepository extends ServiceEntityRepository
         }
 
         return ['lastRegistro' => $DefRegistro];
-
-        /* public function lastRegistro(int $pac_id): array
+    }
+    /* public function lastRegistro(int $pac_id): array
     {
         $query = $this->createQueryBuilder('r')
             ->addSelect('c')
@@ -126,29 +127,79 @@ class RegistroRepository extends ServiceEntityRepository
     } */
 
 
-        //    /**
-        //     * @return Registro[] Returns an array of Registro objects
-        //     */
-        //    public function findByExampleField($value): array
-        //    {
-        //        return $this->createQueryBuilder('r')
-        //            ->andWhere('r.exampleField = :val')
-        //            ->setParameter('val', $value)
-        //            ->orderBy('r.id', 'ASC')
-        //            ->setMaxResults(10)
-        //            ->getQuery()
-        //            ->getResult()
-        //        ;
-        //    }
+    //    /**
+    //     * @return Registro[] Returns an array of Registro objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('r')
+    //            ->andWhere('r.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('r.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-        //    public function findOneBySomeField($value): ?Registro
-        //    {
-        //        return $this->createQueryBuilder('r')
-        //            ->andWhere('r.exampleField = :val')
-        //            ->setParameter('val', $value)
-        //            ->getQuery()
-        //            ->getOneOrNullResult()
-        //        ;
-        //    }
+    //    public function findOneBySomeField($value): ?Registro
+    //    {
+    //        return $this->createQueryBuilder('r')
+    //            ->andWhere('r.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
+    public function getCVUltimosXdias(int $pacienteId, int $dias = 7): array
+    {
+
+        $hoy = new DateTime('today');
+        $inicio = (clone $hoy)->modify('-' . ($dias - 1) . ' days')->setTime(0, 0, 0);
+        $fin = (clone $hoy)->setTime(23, 59, 59);
+
+        $qb = $this->createQueryBuilder('r')
+            ->innerJoin('r.cv_id', 'cv')
+            ->addSelect('cv')
+            ->where('r.pac_id = :pacienteId')
+            ->andWhere('cv.cv_timestamp BETWEEN :inicio AND :fin')
+            ->setParameter('pacienteId', $pacienteId)
+            ->setParameter('inicio', $inicio)
+            ->setParameter('fin', $fin)
+            ->orderBy('cv.cv_timestamp', 'DESC');
+
+        $registros = $qb->getQuery()->getResult();
+
+        $resultados = [];
+
+        foreach ($registros as $registro) {
+            $cv = $registro->getConstantesVitales();
+            if (!$cv) continue;
+
+            $timestamp = $cv->getCvTimestamp();
+            $dia = $timestamp->format('Y-m-d');
+            $hora = (int) $timestamp->format('H');
+
+            // Determinar turno
+            if ($hora >= 7 && $hora < 13) {
+                $turno = 'Matí';
+            } elseif ($hora >= 13 && $hora < 18) {
+                $turno = 'Tarda';
+            } else {
+                $turno = 'Nit';
+            }
+
+            $clave = $dia . '_' . $turno;
+
+            if (!isset($resultados[$clave])) {
+                $resultados[$clave] = [
+                    'cv' => $cv,
+                    'dia' => $dia,
+                    'turno' => $turno
+                ];
+            }
+        }
+
+        return array_values($resultados);
     }
 }

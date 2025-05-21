@@ -62,17 +62,17 @@ final class DietaController extends AbstractController
     {
 
         $roomId = $id;
-            $room = $habitacionRepository->findOneBy(['hab_id' => $roomId]);
-            if ($room == null) {
-                return new JsonResponse(
-                    [
-                        'status' => 404,
-                        'message' => 'roomNotFound',
-                    ],
-                    Response::HTTP_NOT_FOUND
-                );
-            }
-       
+        $room = $habitacionRepository->findOneBy(['hab_id' => $roomId]);
+        if ($room == null) {
+            return new JsonResponse(
+                [
+                    'status' => 404,
+                    'message' => 'roomNotFound',
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
 
         if ($room->getPaciente() == null) {
             return new JsonResponse(
@@ -133,6 +133,51 @@ final class DietaController extends AbstractController
             ]
         );
 
+    }
+
+    #[Route('/history/{id}', name: 'app_dieta_history', methods: ['GET'])]
+    public function getHistory(
+        Request $request,
+        PacienteRepository $pacienteRepository,
+        RegistroRepository $registroRepository,
+        int $id
+    ): JsonResponse {
+        $paciente = $pacienteRepository->find($id);
+        if (!$paciente) {
+            return new JsonResponse(
+                ['status' => 'error', 'message' => 'Paciente not found'],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+        $pacienteId = $id;
+        $paciente = $pacienteRepository->find($pacienteId);
+        $registros = $paciente->getRegistros();
+        $response = [];
+        
+        foreach($registros as $registro){
+            $dieta = $registro->getDieta();
+            if ($dieta) {
+                $response[] = [
+                    'id' => $dieta->getId(),
+                    'Die_Autonomo' => $dieta->isDieAutonomo(),
+                    'Die_Protesi' => $dieta->isDieProtesi(),
+                    'Die_TText' => $dieta->getDieTText() ? [
+                        'id' => $dieta->getDieTText()->getId(),
+                        'descripcion' => $dieta->getDieTText()->getTTextDesc(),
+                    ] : null,
+                    'Tipos_Dietas' => $dieta->getTiposDietas()->map(function (TiposDieta $tipo) {
+                        return [
+                            'id' => $tipo->getId(),
+                            'descripcion' => $tipo->getTDieDesc(),
+                        ];
+                    })->toArray(),
+                ];
+            }
+        }
+        return new JsonResponse(
+            ['status' => 'success', 'data' => ['history' => array_values($response)]],
+            Response::HTTP_OK
+        );
     }
 
     #[Route('/new', name: 'app_dieta_new', methods: ['POST'])]

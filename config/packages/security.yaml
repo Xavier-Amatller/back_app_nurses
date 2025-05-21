@@ -3,6 +3,10 @@ security:
     password_hashers:
         App\Entity\Auxiliar:
             algorithm: auto # Usa bcrypt o argon2i automáticamente según lo disponible
+    #Configuración de los roles        
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_AUXILIAR] # ROLE_ADMIN hereda ROLE_AUXILIAR
+        ROLE_AUXILIAR: [] # ROLE_AUXILIAR no hereda otros roles
 
     # Proveedor de usuarios basado en la entidad Auxiliar
     providers:

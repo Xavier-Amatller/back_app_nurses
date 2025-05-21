@@ -13,7 +13,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/rooms')]
 #[IsGranted('ROLE_AUXILIAR')]
-// #[IsGranted('ROLE_ADMIN')]
 final class HabitacionController extends AbstractController
 {
 

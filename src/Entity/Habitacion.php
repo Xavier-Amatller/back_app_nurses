@@ -14,7 +14,7 @@ class Habitacion
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 5)]
+    #[ORM\Column(length: 5, unique: true)]
     private ?string $hab_id = null;
 
     #[ORM\Column(length: 255)]

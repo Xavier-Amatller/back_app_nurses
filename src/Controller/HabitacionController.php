@@ -24,7 +24,6 @@ final class HabitacionController extends AbstractController
     }
 
     #[Route('', name: 'api_habitaciones_index', methods: ['GET'])]
-
     public function index(Request $request): JsonResponse
     {
         $page = $request->query->getInt('page', 1);
@@ -79,6 +78,14 @@ final class HabitacionController extends AbstractController
         $room = array_map(function ($room) {
 
             $patient = $room->getPaciente();
+            if (!$patient) {
+                return [
+                    'hab_id' => $room->getHabId(),
+                    'hab_obs' => $room->getHabObs(),
+                    'paciente' => null
+                ];
+            }
+
             $fechaNacimiento = $patient->getPacFechaNacimiento();
             $edad = $this->calcAge($fechaNacimiento);
 
@@ -107,5 +114,43 @@ final class HabitacionController extends AbstractController
 
 
         return new JsonResponse($room);
+    }
+
+    #[Route('/{hab_id}/unsubscribe', name: 'api_habitaciones_unsubscribe', methods: ['PUT'])]
+    public function unsubscribe(string $hab_id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $room = $this->habitacionRep->findOneBy(['hab_id' => $hab_id]);
+
+        if (!$room) {
+            return new JsonResponse(['error' => 'Habitación no encontrada'], 404);
+        }
+
+        if (!$room->getPaciente()) {
+            return new JsonResponse([
+                'message' => 'Habitación ya vacía',
+                'data' => [
+                    'hab_id' => $room->getHabId(),
+                    'hab_obs' => $room->getHabObs(),
+                    'paciente' => $room->getPaciente()
+                ]
+            ]);
+        }
+
+        $room->setHabObs('');
+        $room->setPaciente(null);
+
+        $entityManager->persist($room);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Paciente desasignado correctamente',
+            'data' => [
+                'hab_id' => $room->getHabId(),
+                'hab_obs' => $room->getHabObs(),
+                'paciente' => $room->getPaciente()
+            ]
+        ]);
     }
 }

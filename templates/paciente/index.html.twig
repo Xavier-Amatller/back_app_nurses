@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paciente index{% endblock %}
+
+{% block body %}
+    <h1>Paciente index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Pac_num_historial</th>
+                <th>Pac_nombre</th>
+                <th>Pac_apellidos</th>
+                <th>Pac_fecha_nacimiento</th>
+                <th>Pac_direccion_completa</th>
+                <th>Pac_lengua_materna</th>
+                <th>Pac_antecedentes</th>
+                <th>Pac_alergias</th>
+                <th>Pac_nombre_cuidador</th>
+                <th>Pac_telefono_cuidador</th>
+                <th>Pac_fecha_ingreso</th>
+                <th>Pac_timestamp</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for paciente in pacientes %}
+            <tr>
+                <td>{{ paciente.id }}</td>
+                <td>{{ paciente.pacNumHistorial }}</td>
+                <td>{{ paciente.pacNombre }}</td>
+                <td>{{ paciente.pacApellidos }}</td>
+                <td>{{ paciente.pacFechaNacimiento ? paciente.pacFechaNacimiento|date('Y-m-d') : '' }}</td>
+                <td>{{ paciente.pacDireccionCompleta }}</td>
+                <td>{{ paciente.pacLenguaMaterna }}</td>
+                <td>{{ paciente.pacAntecedentes }}</td>
+                <td>{{ paciente.pacAlergias }}</td>
+                <td>{{ paciente.pacNombreCuidador }}</td>
+                <td>{{ paciente.pacTelefonoCuidador }}</td>
+                <td>{{ paciente.pacFechaIngreso ? paciente.pacFechaIngreso|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ paciente.pacTimestamp ? paciente.pacTimestamp|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_paciente_show', {'id': paciente.id}) }}">show</a>
+                    <a href="{{ path('app_paciente_edit', {'id': paciente.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="14">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_paciente_new') }}">Create new</a>
+{% endblock %}

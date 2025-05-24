@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ConstantesVitales index{% endblock %}
+
+{% block body %}
+    <h1>ConstantesVitales index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Cv_ta_sistolica</th>
+                <th>Cv_ta_diastolica</th>
+                <th>Cv_frequencia_respiratoria</th>
+                <th>Cv_pulso</th>
+                <th>Cv_temperatura</th>
+                <th>Cv_saturacion_oxigeno</th>
+                <th>Cv_talla</th>
+                <th>Cv_diuresis</th>
+                <th>Cv_deposiciones</th>
+                <th>Cv_stp</th>
+                <th>Cv_timestamp</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for constantes_vitale in constantes_vitales %}
+            <tr>
+                <td>{{ constantes_vitale.id }}</td>
+                <td>{{ constantes_vitale.cvTaSistolica }}</td>
+                <td>{{ constantes_vitale.cvTaDiastolica }}</td>
+                <td>{{ constantes_vitale.cvFrequenciaRespiratoria }}</td>
+                <td>{{ constantes_vitale.cvPulso }}</td>
+                <td>{{ constantes_vitale.cvTemperatura }}</td>
+                <td>{{ constantes_vitale.cvSaturacionOxigeno }}</td>
+                <td>{{ constantes_vitale.cvTalla }}</td>
+                <td>{{ constantes_vitale.cvDiuresis }}</td>
+                <td>{{ constantes_vitale.cvDeposiciones }}</td>
+                <td>{{ constantes_vitale.cvStp }}</td>
+                <td>{{ constantes_vitale.cvTimestamp ? constantes_vitale.cvTimestamp|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_constantes_vitales_show', {'id': constantes_vitale.id}) }}">show</a>
+                    <a href="{{ path('app_constantes_vitales_edit', {'id': constantes_vitale.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_constantes_vitales_new') }}">Create new</a>
+{% endblock %}

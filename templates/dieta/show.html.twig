@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dieta{% endblock %}
+
+{% block body %}
+    <h1>Dieta</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ dietum.id }}</td>
+            </tr>
+            <tr>
+                <th>Die_Autonomo</th>
+                <td>{{ dietum.DieAutonomo ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Die_Protesi</th>
+                <td>{{ dietum.DieProtesi ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_dieta_index') }}">back to list</a>
+
+    <a href="{{ path('app_dieta_edit', {'id': dietum.id}) }}">edit</a>
+
+    {{ include('dieta/_delete_form.html.twig') }}
+{% endblock %}

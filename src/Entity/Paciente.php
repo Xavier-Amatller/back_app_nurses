@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PacienteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,7 +18,7 @@ class Paciente
     private ?int $id = null;
 
     #[ORM\Column(unique: true)]
-    private ?int $pac_numhistorial = null;
+    private ?int $pac_num_historial = null;
 
     #[ORM\Column(length: 50)]
     private ?string $pac_nombre = null;
@@ -24,11 +26,8 @@ class Paciente
     #[ORM\Column(length: 150)]
     private ?string $pac_apellidos = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $pac_fecha_nacimiento = null;
-
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $pac_fecha_nacimiento1 = null;
+    private ?\DateTimeInterface $pac_fecha_nacimiento = null;
 
     #[ORM\Column(length: 255)]
     private ?string $pac_direccion_completa = null;
@@ -54,6 +53,17 @@ class Paciente
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $pac_timestamp = null;
 
+    /**
+     * @var Collection<int, Registro>
+     */
+    #[ORM\OneToMany(targetEntity: Registro::class, mappedBy: 'pac_id')]
+    private Collection $registros;
+
+    public function __construct()
+    {
+        $this->registros = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,12 +71,12 @@ class Paciente
 
     public function getPacNumhistorial(): ?int
     {
-        return $this->pac_numhistorial;
+        return $this->pac_num_historial;
     }
 
-    public function setPacNumhistorial(int $pac_numhistorial): static
+    public function setPacNumhistorial(int $pac_num_historial): static
     {
-        $this->pac_numhistorial = $pac_numhistorial;
+        $this->pac_num_historial = $pac_num_historial;
 
         return $this;
     }
@@ -95,26 +105,14 @@ class Paciente
         return $this;
     }
 
-    public function getPacFechaNacimiento(): ?string
+    public function getPacFechaNacimiento(): ?\DateTimeInterface
     {
         return $this->pac_fecha_nacimiento;
     }
 
-    public function setPacFechaNacimiento(string $pac_fecha_nacimiento): static
+    public function setPacFechaNacimiento(\DateTimeInterface $pac_fecha_nacimiento): static
     {
         $this->pac_fecha_nacimiento = $pac_fecha_nacimiento;
-
-        return $this;
-    }
-
-    public function getPacFechaNacimiento1(): ?\DateTimeInterface
-    {
-        return $this->pac_fecha_nacimiento1;
-    }
-
-    public function setPacFechaNacimiento1(\DateTimeInterface $pac_fecha_nacimiento1): static
-    {
-        $this->pac_fecha_nacimiento1 = $pac_fecha_nacimiento1;
 
         return $this;
     }
@@ -211,6 +209,36 @@ class Paciente
     public function setPacTimestamp(\DateTimeInterface $pac_timestamp): static
     {
         $this->pac_timestamp = $pac_timestamp;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Registro>
+     */
+    public function getRegistros(): Collection
+    {
+        return $this->registros;
+    }
+
+    public function addRegistro(Registro $registro): static
+    {
+        if (!$this->registros->contains($registro)) {
+            $this->registros->add($registro);
+            $registro->setPaciente($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistro(Registro $registro): static
+    {
+        if ($this->registros->removeElement($registro)) {
+            // set the owning side to null (unless already changed)
+            if ($registro->getPaciente() === $this) {
+                $registro->setPaciente(null);
+            }
+        }
 
         return $this;
     }

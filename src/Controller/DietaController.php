@@ -23,7 +23,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 #[Route('/api/dieta')]
+#[IsGranted('ROLE_AUXILIAR')]
 final class DietaController extends AbstractController
 {
     // #[Route(name: 'app_dieta_index', methods: ['GET'])]

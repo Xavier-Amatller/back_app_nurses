@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Habitacion;
+use App\Entity\Paciente;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,12 +16,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_AUXILIAR')]
 final class HabitacionController extends AbstractController
 {
-
     private $habitacionRep;
+    private $pacienteRep;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->habitacionRep = $entityManager->getRepository(Habitacion::class);
+        $this->pacienteRep = $entityManager->getRepository(Paciente::class);
     }
 
     #[Route('', name: 'api_habitaciones_index', methods: ['GET'])]
@@ -32,7 +34,6 @@ final class HabitacionController extends AbstractController
         $data = $this->habitacionRep->findPaginated($page, $limit);
 
         $rooms = array_map(function ($room) {
-
             $patient = $room->getPaciente();
 
             if ($patient) {
@@ -51,7 +52,7 @@ final class HabitacionController extends AbstractController
                     'pac_fecha_ingreso' => $patient->getPacFechaIngreso()->format('d-m-Y'),
                 ] : null,
             ];
-        },  $data['rooms']);
+        }, $data['rooms']);
 
         return new JsonResponse([
             'rooms' => $rooms,
@@ -76,7 +77,6 @@ final class HabitacionController extends AbstractController
         $data = $this->habitacionRep->findBy(['hab_id' => $hab_id]);
 
         $room = array_map(function ($room) {
-
             $patient = $room->getPaciente();
             if (!$patient) {
                 return [
@@ -110,8 +110,7 @@ final class HabitacionController extends AbstractController
                     ]
                     : null,
             ];
-        },  $data);
-
+        }, $data);
 
         return new JsonResponse($room);
     }
@@ -150,6 +149,54 @@ final class HabitacionController extends AbstractController
                 'hab_id' => $room->getHabId(),
                 'hab_obs' => $room->getHabObs(),
                 'paciente' => $room->getPaciente()
+            ]
+        ]);
+    }
+
+    #[Route('/{hab_id}/assign', name: 'api_habitaciones_assign', methods: ['POST'])]
+    public function assign(string $hab_id, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $room = $this->habitacionRep->findOneBy(['hab_id' => $hab_id]);
+        if (!$room) {
+            return new JsonResponse(['error' => 'Habitación no encontrada'], 404);
+        }
+
+        if ($room->getPaciente()) {
+            return new JsonResponse(['error' => 'La habitación ya tiene un paciente asignado'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $patientId = $data['patientId'] ?? null;
+
+        if (!$patientId) {
+            return new JsonResponse(['error' => 'ID del paciente no proporcionado'], 400);
+        }
+
+        $patient = $this->pacienteRep->find($patientId);
+        if (!$patient) {
+            return new JsonResponse(['error' => 'Paciente no encontrado'], 404);
+        }
+
+        $room->setPaciente($patient);
+        $room->setHabObs('Ocupada');
+
+        $entityManager->persist($room);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Paciente asignado correctamente',
+            'data' => [
+                'hab_id' => $room->getHabId(),
+                'hab_obs' => $room->getHabObs(),
+                'paciente' => [
+                    'pac_id' => $patient->getId(),
+                    'pac_nombre' => $patient->getPacNombre(),
+                    'pac_apellidos' => $patient->getPacApellidos(),
+                    'pac_edad' => $this->calcAge($patient->getPacFechaNacimiento()),
+                    'pac_fecha_ingreso' => $patient->getPacFechaIngreso()->format('d-m-Y'),
+                ]
             ]
         ]);
     }
